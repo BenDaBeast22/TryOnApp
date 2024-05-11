@@ -30,9 +30,14 @@ class MyHomePageState extends State<MyHomePage> {
   List<Widget> pages = const [ProductsPage(), ScanPage(), FavoritesPage()];
   int selectedIndex = 0;
 
-  onPageChanged(int index) {
+  onTap(int index) {
     setState(() {
       selectedIndex = index;
+      pageController.animateToPage(
+        selectedIndex,
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.linear,
+      );
     });
   }
 
@@ -41,7 +46,6 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: PageView(
         controller: pageController,
-        onPageChanged: onPageChanged,
         children: pages,
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -60,16 +64,7 @@ class MyHomePageState extends State<MyHomePage> {
           ),
         ],
         currentIndex: selectedIndex,
-        onTap: (int index) {
-          setState(() {
-            selectedIndex = index;
-            pageController.animateToPage(
-              selectedIndex,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.linear,
-            );
-          });
-        },
+        onTap: onTap,
       ),
     );
   }
