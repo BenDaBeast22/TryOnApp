@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProductsPage(),
+      home: MyHomePage(),
     );
   }
 }
@@ -23,22 +23,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class MyHomePageState extends State<MyHomePage> {
+  PageController pageController = PageController();
+  List<Widget> pages = const [ProductsPage(), ScanPage(), FavoritesPage()];
   int selectedIndex = 0;
-  List<Widget> pages = [
-    const ProductsPage(),
-    const ScanPage(),
-    const FavoritesPage()
-  ];
+
+  onPageChanged(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Header',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 26),
-        ),
+      body: PageView(
+        controller: pageController,
+        onPageChanged: onPageChanged,
+        children: pages,
       ),
-      body: getBody(),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -58,14 +60,15 @@ class MyHomePageState extends State<MyHomePage> {
         onTap: (int index) {
           setState(() {
             selectedIndex = index;
+            pageController.animateToPage(
+              selectedIndex,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.linear,
+            );
           });
         },
       ),
     );
-  }
-
-  Widget getBody() {
-    return pages[selectedIndex];
   }
 }
 
@@ -80,10 +83,7 @@ class ProductsPage extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Products',
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 26),
-          ),
+          title: const HeaderText(text: "Products"),
           bottom: const TabBar(tabs: [
             Tab(
               icon: ImageIcon(AssetImage('images/shoe_icon.png')),
@@ -121,7 +121,6 @@ class ProductsPage extends StatelessWidget {
             ),
           ],
         ),
-        bottomNavigationBar: const BottomNavBar(),
       ),
     );
   }
@@ -134,7 +133,7 @@ class ScanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Scan Page"),
+        title: const HeaderText(text: "Scan Page"),
       ),
     );
   }
@@ -147,32 +146,22 @@ class FavoritesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Favorites"),
+        title: const HeaderText(text: "Favorites"),
       ),
     );
   }
 }
 
-class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({super.key});
+class HeaderText extends StatelessWidget {
+  final String text;
+
+  const HeaderText({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.shop),
-          label: 'Products',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.qr_code),
-          label: 'Scan',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.favorite),
-          label: 'Favorites',
-        ),
-      ],
+    return Text(
+      text,
+      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 26),
     );
   }
 }
